@@ -1,0 +1,16 @@
+# Docker / Laravel / Postgres ignores
+node_modules/
+vendor/
+.git/
+.gitignore
+README.md
+docker/
+*.log
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+.env
+.env.local
+.idea/
+.vscode/

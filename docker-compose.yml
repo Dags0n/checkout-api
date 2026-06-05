@@ -1,0 +1,66 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: checkout-app
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: ${APP_KEY:-}
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: checkout
+      DB_USERNAME: checkout
+      DB_PASSWORD: checkout
+      PAYMENT_GATEWAY: ${PAYMENT_GATEWAY:-fake}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-local-dev-secret-change-me}
+      WEBHOOK_TOLERANCE: "300"
+      LOG_CHANNEL: stack
+    command: >
+      sh -c "php artisan key:generate --force &&
+             php artisan migrate --force &&
+             php artisan db:seed --force &&
+             php artisan serve --host=0.0.0.0 --port=8000"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: checkout-postgres
+    environment:
+      POSTGRES_DB: checkout
+      POSTGRES_USER: checkout
+      POSTGRES_PASSWORD: checkout
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U checkout -d checkout"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres_test:
+    image: postgres:16-alpine
+    container_name: checkout-postgres-test
+    environment:
+      POSTGRES_DB: checkout_test
+      POSTGRES_USER: checkout
+      POSTGRES_PASSWORD: checkout
+    ports:
+      - "5433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+
+volumes:
+  postgres_data:
