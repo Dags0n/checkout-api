@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Policies\OrderPolicy;
 use Catalog\Domain\Contracts\ProductRepositoryContract;
 use Catalog\Infrastructure\EloquentProductRepository;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Order\Domain\Contracts\OrderRepositoryContract;
+use Order\Domain\Order;
 use Order\Infrastructure\EloquentOrderRepository;
 use Payment\Domain\Contracts\PaymentGatewayContract;
 use Payment\Domain\Contracts\PaymentRepositoryContract;
@@ -24,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        Gate::policy(Order::class, OrderPolicy::class);
     }
 
     private function registerRepositories(): void

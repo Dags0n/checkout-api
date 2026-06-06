@@ -9,6 +9,7 @@ use Payment\Domain\ValueObjects\CreditCard;
 final readonly class CheckoutInput
 {
     public function __construct(
+        public int $userId,
         public string $customerName,
         public string $customerEmail,
         public CreditCard $creditCard,

@@ -8,6 +8,7 @@ use App\Http\Resources\OrderResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Gate;
 use Order\Domain\Contracts\OrderRepositoryContract;
 use Order\Domain\Order;
 
@@ -19,6 +20,8 @@ final class OrderController extends Controller
     {
         $order = $this->orders->findByIdWithRelations($id)
             ?? throw (new ModelNotFoundException)->setModel(Order::class, [$id]);
+
+        Gate::authorize('view', $order);
 
         return response()->json([
             'data' => OrderResource::make($order),

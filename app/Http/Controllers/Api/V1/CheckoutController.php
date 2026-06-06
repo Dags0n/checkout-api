@@ -23,6 +23,7 @@ final class CheckoutController extends Controller
         $user = $request->user();
 
         $input = new CheckoutInput(
+            userId: $user->id,
             customerName: $user->name,
             customerEmail: $user->email,
             creditCard: new CreditCard(
@@ -32,7 +33,7 @@ final class CheckoutController extends Controller
                 cvv: $validated['credit_card']['cvv'],
             ),
             items: array_map(
-                fn (array $i): array => ['productId' => $i['product_id'], 'quantity' => (int) $i['quantity']],
+                fn(array $i): array => ['productId' => $i['product_id'], 'quantity' => (int) $i['quantity']],
                 $validated['items'],
             ),
         );

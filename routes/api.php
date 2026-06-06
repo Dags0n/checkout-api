@@ -13,7 +13,7 @@ Route::get('/health', fn() => response()->json(['data' => ['status' => 'ok'], 'm
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function (): void {
+Route::middleware(['auth:sanctum', 'idempotency'])->group(function (): void {
     Route::post('/checkout', [CheckoutController::class, 'store']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
 });

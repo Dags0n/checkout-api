@@ -31,6 +31,7 @@ final class CheckoutService
     {
         $order = DB::transaction(function () use ($input): Order {
             $order = $this->orders->save(new Order([
+                'user_id' => $input->userId,
                 'customer_name' => $input->customerName,
                 'customer_email' => $input->customerEmail,
                 'status' => OrderStatus::Pending,

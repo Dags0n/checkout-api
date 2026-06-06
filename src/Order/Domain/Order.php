@@ -15,7 +15,7 @@ use Order\Domain\Exceptions\InvalidOrderStateException;
 use Payment\Domain\Payment;
 use Shared\Domain\Concerns\HasUuid;
 
-#[Fillable(['customer_name', 'customer_email', 'status', 'total_cents', 'currency'])]
+#[Fillable(['customer_name', 'customer_email', 'status', 'total_cents', 'currency', 'user_id'])]
 class Order extends Model
 {
     use HasFactory;
@@ -48,6 +48,11 @@ class Order extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class);
     }
 
     public function latestPayment(): ?Payment

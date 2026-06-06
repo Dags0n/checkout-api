@@ -25,7 +25,9 @@ final class WebhookController extends Controller
         ));
 
         return response()->json([
-            'data' => ['processed' => true],
+            'data' => [
+                'processed' => true,
+            ],
             'meta' => [],
         ]);
     }
