@@ -166,6 +166,12 @@ Schedule::command('app:simulate-payment-webhook')
 
 Adicione via `crontab -e` no servidor.
 
+### Para executar localmente para testes basta 
+
+```bash
+php artisan schedule:work
+```
+
 ## 8. Testes
 
 ```bash
