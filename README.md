@@ -56,7 +56,7 @@ Cliente                  App/Backend                Gateway              Webhook
    │                          ├──────────────────────►│                     │
 ```
 
-## 4. Setup
+## 4. Setup (Como rodar)
 
 ### Pré-requisitos
 
