@@ -43,7 +43,7 @@ final class AuthController extends Controller
     {
         $data = $request->validated();
 
-        $user = User::firstWhere('email', $data['email']);
+        $user = User::where('email', $data['email'])->first();
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages([
