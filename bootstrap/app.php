@@ -24,7 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'verify.webhook.signature' => VerifyWebhookSignature::class,
-            'auth' => \App\Http\Middleware\Authenticate::class,
+            'auth'                     => \App\Http\Middleware\Authenticate::class,
+            'idempotency'             => \App\Http\Middleware\HandleIdempotency::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
