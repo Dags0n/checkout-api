@@ -15,6 +15,8 @@ use Order\Infrastructure\EloquentOrderRepository;
 use Payment\Domain\Contracts\PaymentGatewayContract;
 use Payment\Domain\Contracts\PaymentRepositoryContract;
 use Payment\Domain\Contracts\WebhookSignatureVerifierContract;
+use Payment\Domain\Contracts\WebhookTranslatorContract;
+use Payment\Infrastructure\Gateways\MercadoPago\MercadoPagoClient;
 use Payment\Infrastructure\Persistence\EloquentPaymentRepository;
 
 class AppServiceProvider extends ServiceProvider
@@ -50,5 +52,11 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(PaymentGatewayContract::class, $gatewayConfig['driver']);
         $this->app->bind(WebhookSignatureVerifierContract::class, $gatewayConfig['signature_verifier']);
+        $this->app->bind(WebhookTranslatorContract::class, $gatewayConfig['translator']);
+
+        $this->app->singleton(MercadoPagoClient::class, fn (): MercadoPagoClient => new MercadoPagoClient(
+            apiUrl: (string) config('payment.gateways.mercadopago.api_url'),
+            accessToken: (string) config('payment.gateways.mercadopago.access_token'),
+        ));
     }
 }
