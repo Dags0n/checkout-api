@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Payment\Infrastructure\Gateways\Fake;
 
 use Payment\Domain\Contracts\WebhookSignatureVerifierContract;
+use Payment\Domain\ValueObjects\WebhookSignatureContext;
 
 final class FakeSignatureVerifier implements WebhookSignatureVerifierContract
 {
-    public function verify(string $payload, string $signature, int $timestamp): bool
+    public function verify(WebhookSignatureContext $context): bool
     {
         $tolerance = (int) config('payment.webhook.tolerance_seconds', 300);
-        if (abs(time() - $timestamp) > $tolerance) {
+        if (abs(time() - $context->timestamp) > $tolerance) {
             return false;
         }
 
@@ -20,8 +21,8 @@ final class FakeSignatureVerifier implements WebhookSignatureVerifierContract
             return false;
         }
 
-        $expected = hash_hmac('sha256', $timestamp . '.' . $payload, $secret);
+        $expected = hash_hmac('sha256', $context->timestamp.'.'.$context->rawBody, $secret);
 
-        return hash_equals($expected, $signature);
+        return hash_equals($expected, $context->signature);
     }
 }
