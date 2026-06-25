@@ -3,8 +3,10 @@
 declare(strict_types=1);
 use Payment\Infrastructure\Gateways\Fake\FakePaymentGateway;
 use Payment\Infrastructure\Gateways\Fake\FakeSignatureVerifier;
+use Payment\Infrastructure\Gateways\Fake\FakeWebhookTranslator;
 use Payment\Infrastructure\Gateways\MercadoPago\MercadoPagoPaymentGateway;
 use Payment\Infrastructure\Gateways\MercadoPago\MercadoPagoSignatureVerifier;
+use Payment\Infrastructure\Gateways\MercadoPago\MercadoPagoWebhookTranslator;
 
 return [
 
@@ -54,13 +56,16 @@ return [
         'fake' => [
             'driver' => FakePaymentGateway::class,
             'signature_verifier' => FakeSignatureVerifier::class,
+            'translator' => FakeWebhookTranslator::class,
         ],
 
         'mercadopago' => [
             'driver' => MercadoPagoPaymentGateway::class,
             'signature_verifier' => MercadoPagoSignatureVerifier::class,
+            'translator' => MercadoPagoWebhookTranslator::class,
             'access_token' => env('MP_ACCESS_TOKEN'),
             'api_url' => env('MP_API_URL', 'https://api.mercadopago.com'),
+            'webhook_secret' => env('MP_WEBHOOK_SECRET'),
         ],
 
     ],

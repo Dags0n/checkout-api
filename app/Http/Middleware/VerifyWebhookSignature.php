@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Payment\Domain\Contracts\WebhookSignatureVerifierContract;
+use Payment\Domain\ValueObjects\WebhookSignatureContext;
 use Symfony\Component\HttpFoundation\Response;
 
 final class VerifyWebhookSignature
@@ -17,10 +18,7 @@ final class VerifyWebhookSignature
     public function handle(Request $request, Closure $next): Response
     {
         $signatureHeader = (string) $request->header('X-Signature', '');
-        $timestamp = (int) $request->header('X-Signature-Timestamp', 0);
-        $payload = (string) $request->getContent();
-
-        if ($signatureHeader === '' || $timestamp === 0) {
+        if ($signatureHeader === '') {
             return $this->unauthorized('Missing signature headers.');
         }
 
@@ -34,7 +32,20 @@ final class VerifyWebhookSignature
             return $this->unauthorized('Missing v1 component.');
         }
 
-        if (! $this->verifier->verify($payload, $hmac, $timestamp)) {
+        $timestamp = (int) ($parts['ts'] ?? $request->header('X-Signature-Timestamp', 0));
+        if ($timestamp === 0) {
+            return $this->unauthorized('Missing signature timestamp.');
+        }
+
+        $context = new WebhookSignatureContext(
+            rawBody: (string) $request->getContent(),
+            timestamp: $timestamp,
+            signature: $hmac,
+            dataId: $this->extractDataId($request),
+            requestId: $request->header('X-Request-Id'),
+        );
+
+        if (! $this->verifier->verify($context)) {
             return $this->unauthorized('Invalid signature or expired timestamp.');
         }
 
@@ -52,6 +63,13 @@ final class VerifyWebhookSignature
         }
 
         return $result === [] ? null : $result;
+    }
+
+    private function extractDataId(Request $request): ?string
+    {
+        $dataId = $request->query('data_id') ?? $request->query('id');
+
+        return is_string($dataId) ? $dataId : null;
     }
 
     private function unauthorized(string $message): JsonResponse
